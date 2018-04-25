@@ -22,7 +22,7 @@ dtypes = {
         'click_id'      : 'uint32'
         }
 print('Loading the training data...')
-train = pd.read_csv(train_path, skiprows=range(1, 2), dtype=dtypes, nrows=90000, usecols=train_cols)
+train = pd.read_csv(train_path, skiprows=range(1, 2), dtype=dtypes, nrows=10, usecols=train_cols)
 train.info()
 len_train = len(train)
 print('The initial size of the train set is', len_train)
@@ -68,7 +68,7 @@ def df_featured(df):
     print('4. grouping by : ip_day_chl_var_hour..')
     n_channel = df[['ip', 'day', 'hour', 'channel']].groupby(by=['ip', 'day',
                                                                  'channel'])[['hour']].var().reset_index().rename(
-        index=str, columns={'hour': 'ip_tchan_count'})
+        columns={'hour': 'ip_tchan_count'})
     print('Merging the hour data with the main data set...\n')
     df = df.merge(n_channel, on=['ip', 'day', 'channel'], how='left')
     del n_channel
@@ -87,7 +87,7 @@ def df_featured(df):
     print('6. grouping by : ip_app_channel_var_day...')
     n_channel = df[['ip', 'app', 'channel', 'day']].groupby(by=['ip', 'app',
                                                                 'channel'])[['day']].var().reset_index().rename(
-        index=str, columns={'day': 'ip_app_channel_var_day'})
+        columns={'day': 'ip_app_channel_var_day'})
     print('Merging the day data with the main data set...\n')
     df = df.merge(n_channel, on=['ip', 'app', 'channel'], how='left')
     del n_channel
@@ -96,7 +96,7 @@ def df_featured(df):
     print('7. grouping by : ip_app_chl_mean_hour..')
     n_channel = df[['ip', 'app', 'channel', 'hour']].groupby(by=['ip', 'app',
                                                                  'channel'])[['hour']].mean().reset_index().rename(
-        index=str, columns={'hour': 'ip_app_channel_mean_hour'})
+        columns={'hour': 'ip_app_channel_mean_hour'})
     print('Merging the meanhour data with the main data set...\n')
     df = df.merge(n_channel, on=['ip', 'app', 'channel'], how='left')
     del n_channel
@@ -110,6 +110,10 @@ def df_featured(df):
     df = df.merge(n_channel, on=['ip', 'device', 'day', 'hour'], how='left')
     del n_channel
     gc.collect()
+
+
+
+
     df['n_channels'] = df['n_channels'].astype('uint16')
     df['ip_app_count'] = df['ip_app_count'].astype('uint16')
     df['ip_app_os_count'] = df['ip_app_os_count'].astype('uint16')
@@ -118,6 +122,8 @@ def df_featured(df):
     df['ip_app_channel_var_day'] = df['ip_app_channel_var_day'].astype('float32')
     df['ip_app_channel_mean_hour'] = df['ip_app_channel_mean_hour'].astype('float32')
     df['nip_hh_dev'] = df['nip_hh_dev'].astype('uint16')
+
+
     df.drop(['ip', 'day'], axis=1, inplace=True)
     gc.collect()
     return df
